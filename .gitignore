@@ -3,3 +3,4 @@ logs/
 venv-mlops/
 *.pyc
 __pycache__/
+vector-db/
