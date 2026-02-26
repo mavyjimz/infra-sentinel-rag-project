@@ -55,3 +55,31 @@
 ## Phase 14: CI/CD Automation (p14-github-actions)
 * **Objective**: Ensure the pipeline stays "Green" with every push [cite: 2026-01-27].
 * **Logic**: Finalize YAML workflows to trigger builds and tests automatically [cite: 2026-02-24].
+
+## Phase 15: Observability & Monitoring (p15-monitoring.py)
+* **Objective**: Implement system health checks and performance tracking.
+* **Logic**: Automated monitoring of vector database latency and embedding model availability using GitHub Actions alerts.
+
+## Phase 16: Continuous Improvement (p16-feedback.py)
+* **Objective**: Establish a feedback loop for data evolution.
+* **Logic**: Bridge GitHub Issues (human feedback) back to Phase 1 for automated re-ingestion of corrected technical data.
+
+## Phase 17: FinOps & Resource Profiling (p17-profiler.py)
+* **Objective**: Profile hardware consumption and optimize operational costs.
+* **Logic**: Use a script to measure peak RAM usage during RAG retrieval and GPU utilization on the MX150.
+* **Outcome**: Generate a "Cost-per-Query" report to justify infrastructure scaling or optimization needs.
+
+## Phase 18: Documentation & Career Portability
+* **Objective**: Consolidate technical lessons into a professional portfolio.
+* **Logic**: Generate a final project summary linking 18 years of infrastructure experience to new MLOps skills.
+* **Outcome**: A polished GitHub README and resume-ready documentation for recruitment.
+
+## Phase 19: Security & Infrastructure-as-Code (p19-security.py)
+* **Objective**: Hardening the pipeline and optimizing local resources.
+* **Logic**: Script-based secret scanning to prevent token leaks and automated maintenance routines for the 8GB RAM environment.
+* **Outcome**: A secure, self-cleaning MLOps environment.
+
+## Phase 20: Disaster Recovery & State Backup
+* **Objective**: Ensure project indestuctibility and business continuity.
+* **Logic**: Automated state backup of the ChromaDB vector store and environment configurations.
+* **Outcome**: Ability to restore the entire "Sentinel" ecosystem in minutes following hardware failure.
