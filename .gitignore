@@ -1,0 +1,5 @@
+input-data/
+logs/
+venv-mlops/
+*.pyc
+__pycache__/
