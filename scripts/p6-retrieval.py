@@ -1,39 +1,44 @@
-import os
+# Phase 6: Vector Database Retrieval
+# Objective: Search ChromaDB for relevant technical profiles based on a query.
+
 import chromadb
 from chromadb.utils import embedding_functions
+import os
 
-def run_retrieval_logic():
-    # Use absolute pathing for ZenBook environment reliability
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    db_path = os.path.join(base_dir, "vector-db")
+def run_retrieval_logic(user_query=None):
+    # 1. Setup paths
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    persist_dir = os.path.join(base_dir, "..", "data", "chroma_db")
+    
+    # 2. Use local embedding model (Optimized for MX150/8GB RAM) [cite: 2026-02-23]
+    emb_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name="all-MiniLM-L6-v2"
+    )
 
-    print("Phase 6: Initializing Semantic Retrieval Engine...")
+    # 3. Connect to ChromaDB
+    client = chromadb.PersistentClient(path=persist_dir)
+    collection = client.get_collection(name="infra_sentinel_index", embedding_function=emb_fn)
 
-    try:
-        # 1. Connect to the persistent ChromaDB store
-        client = chromadb.PersistentClient(path=db_path)
+    # 4. Handle default test query if none provided
+    if user_query is None:
+        user_query = "Expert in Linux and Docker"
+
+    # 5. Execute Semantic Search
+    results = collection.query(
+        query_texts=[user_query],
+        n_results=2
+    )
+
+    # 6. Format results for Phase 9 Orchestration
+    context_list = results.get('documents', [[]])[0]
+    combined_context = "\n---\n".join(context_list)
+    
+    # Return for Phase 9, print for manual testing
+    if __name__ == "__main__":
+        print(f"DEBUG RETRIEVAL FOR: {user_query}")
+        print(combined_context)
         
-        # 2. Use the same MX150 optimized model from Phase 4/5 [cite: 2026-02-23]
-        model_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
-        collection = client.get_collection(name="infra_sentinel_index", embedding_function=model_func)
-
-        # 3. Define a technical query to test logic
-        user_query = "Find me developers with strong experience in Docker, Kubernetes, and Python"
-        print(f"Searching for: {user_query}")
-
-        # 4. Perform Similarity Search (Retrieve top 2 matches)
-        results = collection.query(
-            query_texts=[user_query],
-            n_results=2
-        )
-
-        # 5. Display the retrieved context
-        print("\n--- Top Retrieved Technical Context ---")
-        for i, document in enumerate(results['documents'][0]):
-            print(f"Match {i+1}: {document}\n")
-
-    except Exception as e:
-        print(f"Phase 6 Error: {e}")
+    return combined_context
 
 if __name__ == "__main__":
     run_retrieval_logic()
