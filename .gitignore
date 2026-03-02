@@ -4,3 +4,4 @@ venv-mlops/
 *.pyc
 __pycache__/
 vector-db/
+.env
