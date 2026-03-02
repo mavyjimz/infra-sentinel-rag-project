@@ -5,3 +5,4 @@ venv-mlops/
 __pycache__/
 vector-db/
 .env
+.git/

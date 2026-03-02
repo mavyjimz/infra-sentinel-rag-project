@@ -1,0 +1,18 @@
+# Ignore the virtual environment
+venv-mlops/
+
+# Ignore Python cache files
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore local secrets (we will mount these later)
+.env
+
+# Ignore Git history
+.git/
+.gitignore
+
+# Ignore the vector database (we will mount this as a volume)
+vector-db/
