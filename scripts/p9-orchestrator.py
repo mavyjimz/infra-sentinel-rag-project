@@ -1,4 +1,4 @@
-# Phase 9: RAG Chain Orchestration (Hyphen-Safe Version)
+# Phase 9: RAG Chain Orchestration (Hardened Version)
 
 import requests
 import json
@@ -21,24 +21,33 @@ p6 = import_hyphenated_module("p6_retrieval", os.path.join(base_dir, "p6-retriev
 
 def run_sentinel_pipeline(user_query):
     print(f"\n[ORCHESTRATOR] Processing Query: {user_query}")
-    
+
     # RETRIEVE: Calling p6-retrieval.py
-    context_results = p6.run_retrieval_logic(user_query) 
-    
+    context_results = p6.run_retrieval_logic(user_query)
+
     # PROMPT: Calling p7-prompting.py
     full_prompt = p7.get_sentinel_prompt(context_results, user_query)
-    
+
     # GENERATE: Local Ollama (MX150/CUDA) [cite: 2026-02-23]
     url = "http://localhost:11434/api/generate"
     payload = {"model": "qwen", "prompt": full_prompt, "stream": False}
-    
+
     try:
-        response = requests.post(url, json=payload)
-        return response.json().get('response', "Pipeline Error.")
-    except Exception as e:
+        # Added timeout=60 for complex RAG chains to satisfy Bandit B113
+        response = requests.post(url, json=payload, timeout=60)
+        response.raise_for_status()
+        return response.json().get('response', "Pipeline Error: No response.")
+    
+    except requests.exceptions.Timeout:
+        return "Orchestration Error: Connection to local LLM timed out."
+    except requests.exceptions.RequestException as e:
         return f"Orchestration Error: {str(e)}"
 
 if __name__ == "__main__":
     test_query = "Find me an expert in Linux and Docker."
-    final_answer = run_sentinel_pipeline(test_query)
-    print(f"\nSENTINEL FINAL ANSWER:\n{final_answer}")
+    try:
+        final_answer = run_sentinel_pipeline(test_query)
+        print(f"\nSENTINEL FINAL ANSWER:\n{final_answer}")
+    except Exception as e:
+        print(f"Unexpected System Error: {e}")
+        sys.exit(1)
