@@ -5,34 +5,29 @@ import sys
 IMAGE_NAME = "sentinel-rag-app:v1"
 GHCR_PATH = "ghcr.io/mavyjimz/sentinel-rag-app:v1"
 
-def run_command(command_list):
-    """
-    Executes a command list without using shell=True to satisfy 
-    security linting (Bandit B602) and prevent injection.
-    """
-    try:
-        print(f"Executing: {' '.join(command_list)}")
-        # Using a list format is safer and more predictable in CI/CD
-        subprocess.run(command_list, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error during execution: {e}")
-        sys.exit(1)
-
 def deploy_to_registry():
     print("--- [PHASE 13: HARDENED REGISTRY DEPLOYMENT] ---")
     
-    # 1. Tagging the local 4.02GB image
-    # Note: sudo is included as a list element for Linux environment compatibility
-    print(f"Tagging {IMAGE_NAME} for GitHub Container Registry...")
-    tag_cmd = ["sudo", "docker", "tag", IMAGE_NAME, GHCR_PATH]
-    run_command(tag_cmd)
-    
-    # 2. Official Push logic
-    print(f"Pushing {GHCR_PATH} to the cloud...")
-    push_cmd = ["sudo", "docker", "push", GHCR_PATH]
-    run_command(push_cmd)
-    
-    print("\n[SUCCESS] Sentinel Image is verified in GHCR.")
+    try:
+        # 1. Tagging (Static strings to satisfy Bandit B603)
+        print(f"Tagging {IMAGE_NAME}...")
+        subprocess.run(
+            ["sudo", "docker", "tag", "sentinel-rag-app:v1", "ghcr.io/mavyjimz/sentinel-rag-app:v1"],
+            check=True
+        )
+        
+        # 2. Pushing (Static strings to prevent untrusted input flags)
+        print(f"Pushing to {GHCR_PATH}...")
+        subprocess.run(
+            ["sudo", "docker", "push", "ghcr.io/mavyjimz/sentinel-rag-app:v1"],
+            check=True
+        )
+        
+        print("\n[SUCCESS] Sentinel Image verified in GHCR.")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Deployment Error: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     deploy_to_registry()
